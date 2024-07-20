@@ -12,7 +12,7 @@ TEST(TEST_BOXSDF, ALLTEST) {
   Vector3d trans = Vector3d(0.5, 0.5, 0.5);
   {
     auto mat = Matrix3d::Identity();
-    auto tf = FullTransform(Vector3d(0.5, 0.5, 0.5), mat);
+    auto tf = Pose(Vector3d(0.5, 0.5, 0.5), mat);
     auto sdf = BoxSDF({1, 1, 1}, tf);
     auto values = sdf.evaluate(points.transpose().colwise() + trans);
     for (int i = 0; i < values.size(); i++) {
@@ -23,7 +23,7 @@ TEST(TEST_BOXSDF, ALLTEST) {
     Matrix3d mat;
     mat << cos(M_PI / 4), -sin(M_PI / 4), 0, sin(M_PI / 4), cos(M_PI / 4), 0, 0,
         0, 1;
-    auto tf = FullTransform(Vector3d(0.5, 0.5, 0.5), mat);
+    auto tf = Pose(Vector3d(0.5, 0.5, 0.5), mat);
     auto sdf = BoxSDF({1, 1, 1}, tf);
     auto values = sdf.evaluate((mat * points.transpose()).colwise() + trans);
     for (int i = 0; i < values.size(); i++) {

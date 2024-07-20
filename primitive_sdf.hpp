@@ -7,15 +7,9 @@ namespace primitive_sdf {
 using Points = Eigen::Matrix3Xd;
 using Values = Eigen::VectorXd;
 
-class TransformBase {
-  virtual Eigen::Matrix3Xd transform_points(
-      const Eigen::Matrix3Xd& p) const = 0;
-};
-
-class FullTransform : public TransformBase {
+class Pose {
  public:
-  FullTransform(const Eigen::Vector3d& position,
-                const Eigen::Matrix3d& rotation)
+  Pose(const Eigen::Vector3d& position, const Eigen::Matrix3d& rotation)
       : position_(position), rot_inv_(rotation.inverse()) {}
 
   Points transform_points(const Points& p) const {
@@ -27,10 +21,9 @@ class FullTransform : public TransformBase {
   Eigen::Matrix3d rot_inv_;
 };
 
-template <typename TransformType>
 class SDFBase {
  public:
-  SDFBase(const TransformType& tf) : tf_(tf) {}
+  SDFBase(const Pose& tf) : tf_(tf) {}
 
   Values evaluate(const Points& p) const {
     auto p_local = tf_.transform_points(p);
@@ -38,18 +31,18 @@ class SDFBase {
   }
 
  private:
-  TransformType tf_;
+  Pose tf_;
 
  protected:
   virtual Values evaluate_in_local_frame(const Points& p) const = 0;
 };
 
-class BoxSDF : public SDFBase<FullTransform> {
+class BoxSDF : public SDFBase {
  public:
   Eigen::Vector3d width_;
 
-  BoxSDF(const Eigen::Vector3d& width, const FullTransform& tf)
-      : SDFBase<FullTransform>(tf), width_(width) {}
+  BoxSDF(const Eigen::Vector3d& width, const Pose& tf)
+      : SDFBase(tf), width_(width) {}
 
  private:
   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
@@ -71,7 +64,7 @@ class BoxSDF : public SDFBase<FullTransform> {
 //   CylinderSDF(radius, height, TranslationTransform(tf)) {} CylinderSDF(double
 //   radius, double height, const TranslationTransform& tf) :
 //   SDFBase<TranslationTransform>(tf), radius_(radius), height_(height) {}
-// 
+//
 // private:
 //   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
 //     auto d = (p.topRows(2).colwise().norm() - radius_).eval();
