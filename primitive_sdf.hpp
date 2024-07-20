@@ -23,9 +23,14 @@ class Pose {
 
 class SDFBase {
  public:
-  SDFBase(const Pose& tf) : tf_(tf) {}
+  virtual Values evaluate(const Points& p) const = 0;
+};
 
-  Values evaluate(const Points& p) const {
+class PrimitiveSDFBase : public SDFBase {
+ public:
+  PrimitiveSDFBase(const Pose& tf) : tf_(tf) {}
+
+  Values evaluate(const Points& p) const override {
     auto p_local = tf_.transform_points(p);
     return evaluate_in_local_frame(p_local);
   }
@@ -36,12 +41,12 @@ class SDFBase {
   virtual Values evaluate_in_local_frame(const Points& p) const = 0;
 };
 
-class BoxSDF : public SDFBase {
+class BoxSDF : public PrimitiveSDFBase {
  public:
   Eigen::Vector3d width_;
 
   BoxSDF(const Eigen::Vector3d& width, const Pose& tf)
-      : SDFBase(tf), width_(width) {}
+      : PrimitiveSDFBase(tf), width_(width) {}
 
  private:
   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
@@ -54,12 +59,12 @@ class BoxSDF : public SDFBase {
   }
 };
 
-class CylinderSDF : public SDFBase {
+class CylinderSDF : public PrimitiveSDFBase {
  public:
   double radius_;
   double height_;
   CylinderSDF(double radius, double height, const Pose& tf)
-      : SDFBase(tf), radius_(radius), height_(height) {}
+      : PrimitiveSDFBase(tf), radius_(radius), height_(height) {}
 
  private:
   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
@@ -72,11 +77,12 @@ class CylinderSDF : public SDFBase {
   }
 };
 
-class SphereSDF : public SDFBase {
+class SphereSDF : public PrimitiveSDFBase {
  public:
   double radius_;
 
-  SphereSDF(double radius, const Pose& tf) : SDFBase(tf), radius_(radius) {}
+  SphereSDF(double radius, const Pose& tf)
+      : PrimitiveSDFBase(tf), radius_(radius) {}
 
  private:
   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
