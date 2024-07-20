@@ -1,0 +1,14 @@
+#include <nanobind/eigen/dense.h>
+#include <nanobind/nanobind.h>
+#include "primitive_sdf.hpp"
+
+namespace nb = nanobind;
+NB_MODULE(primitive_sdf, m) {
+  m.doc() = "Primitive SDF module";
+  nb::class_<primitive_sdf::FullTransform>(m, "Transform")
+      .def(nb::init<const Eigen::Vector3d&, const Eigen::Matrix3d&>());
+  nb::class_<primitive_sdf::BoxSDF>(m, "BoxSDF")
+      .def(nb::init<const Eigen::Vector3d&,
+                    const primitive_sdf::FullTransform&>())
+      .def("evaluate", &primitive_sdf::BoxSDF::evaluate);
+}
