@@ -18,16 +18,6 @@ endif(BUILD_TESTING)
 
 option(BUILD_BINDING "build python binding" OFF)
 if(BUILD_BINDING)
-  find_package(Python
-    REQUIRED COMPONENTS Interpreter Development.Module)
-  set(Python3_EXECUTABLE /usr/bin/python3.8)
-  add_subdirectory(nanobind)
-
-  nanobind_add_module(
-    primitive_sdf
-    STABLE_ABI
-    NB_STATIC
-    binding.cpp
-  )
-  # install(TARGETS nanobind_example_ext LIBRARY DESTINATION nanobind_example)
+  add_subdirectory(pybind11)
+  pybind11_add_module(primitive_sdf binding.cpp)
 endif(BUILD_BINDING)

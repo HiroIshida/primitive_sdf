@@ -5,7 +5,7 @@ import build.primitive_sdf as psdf
 from skrobot.model.primitives import Box
 
 if __name__ == "__main__":
-    tf = psdf.Transform(np.zeros(3), np.eye(3))
+    tf = psdf.Pose(np.zeros(3), np.eye(3))
     sdf = psdf.BoxSDF(np.array([1, 1, 1]), tf)
     box = Box([1, 1, 1], with_sdf=True)
     points = np.random.randn(30, 3)
