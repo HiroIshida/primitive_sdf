@@ -5,17 +5,21 @@
 #include "primitive_sdf.hpp"
 namespace py = pybind11;
 
+namespace primitive_sdf {
+
 PYBIND11_MODULE(primitive_sdf, m) {
   m.doc() = "Primitive SDF module";
-  py::class_<primitive_sdf::Pose>(m, "Pose").def(
+  py::class_<Pose>(m, "Pose").def(
       py::init<const Eigen::Vector3d&, const Eigen::Matrix3d&>());
-  py::class_<primitive_sdf::BoxSDF>(m, "BoxSDF")
-      .def(py::init<const Eigen::Vector3d&, const primitive_sdf::Pose&>())
-      .def("evaluate", &primitive_sdf::BoxSDF::evaluate);
-  py::class_<primitive_sdf::CylinderSDF>(m, "CylinderSDF")
-      .def(py::init<double, double, const primitive_sdf::Pose&>())
-      .def("evaluate", &primitive_sdf::CylinderSDF::evaluate);
-  py::class_<primitive_sdf::SphereSDF>(m, "SphereSDF")
-      .def(py::init<double, const primitive_sdf::Pose&>())
-      .def("evaluate", &primitive_sdf::SphereSDF::evaluate);
+  py::class_<BoxSDF>(m, "BoxSDF")
+      .def(py::init<const Eigen::Vector3d&, const Pose&>())
+      .def("evaluate", &BoxSDF::evaluate);
+  py::class_<CylinderSDF>(m, "CylinderSDF")
+      .def(py::init<double, double, const Pose&>())
+      .def("evaluate", &CylinderSDF::evaluate);
+  py::class_<SphereSDF>(m, "SphereSDF")
+      .def(py::init<double, const Pose&>())
+      .def("evaluate", &SphereSDF::evaluate);
 }
+
+}  // namespace primitive_sdf
