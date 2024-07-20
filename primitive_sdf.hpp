@@ -1,6 +1,8 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <iostream>
+#include <memory>
+#include <vector>
 
 namespace primitive_sdf {
 
@@ -24,6 +26,21 @@ class Pose {
 class SDFBase {
  public:
   virtual Values evaluate(const Points& p) const = 0;
+};
+
+class UnionSDF : public SDFBase {
+ public:
+  UnionSDF(std::vector<std::shared_ptr<SDFBase>> sdfs) : sdfs_(sdfs) {}
+  Values evaluate(const Points& p) const override {
+    Values vals = sdfs_[0]->evaluate(p);
+    for (size_t i = 1; i < sdfs_.size(); i++) {
+      vals = vals.cwiseMin(sdfs_[i]->evaluate(p));
+    }
+    return vals;
+  }
+
+ private:
+  std::vector<std::shared_ptr<SDFBase>> sdfs_;
 };
 
 class PrimitiveSDFBase : public SDFBase {
