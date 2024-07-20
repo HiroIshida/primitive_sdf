@@ -10,4 +10,10 @@ NB_MODULE(primitive_sdf, m) {
   nb::class_<primitive_sdf::BoxSDF>(m, "BoxSDF")
       .def(nb::init<const Eigen::Vector3d&, const primitive_sdf::Pose&>())
       .def("evaluate", &primitive_sdf::BoxSDF::evaluate);
+  nb::class_<primitive_sdf::CylinderSDF>(m, "CylinderSDF")
+      .def(nb::init<double, double, const primitive_sdf::Pose&>())
+      .def("evaluate", &primitive_sdf::CylinderSDF::evaluate);
+  nb::class_<primitive_sdf::SphereSDF>(m, "SphereSDF")
+      .def(nb::init<double, const primitive_sdf::Pose&>())
+      .def("evaluate", &primitive_sdf::SphereSDF::evaluate);
 }
