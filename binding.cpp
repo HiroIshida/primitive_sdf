@@ -7,7 +7,7 @@ namespace py = pybind11;
 
 namespace primitive_sdf {
 
-PYBIND11_MODULE(primitive_sdf, m) {
+PYBIND11_MODULE(_psdf, m) {
   m.doc() = "Primitive SDF module";
   py::class_<Pose>(m, "Pose").def(
       py::init<const Eigen::Vector3d&, const Eigen::Matrix3d&>());
