@@ -85,12 +85,17 @@ class CylinderSDF : public PrimitiveSDFBase {
 
  private:
   Values evaluate_in_local_frame(const Eigen::Matrix3Xd& p) const override {
-    Eigen::VectorXd&& d = (p.topRows(2).colwise().norm().array() - radius_);
-    auto outside_distance = (d.cwiseMax(0.0)).colwise().norm();
-    auto inside_distance = d.cwiseMin(0.0).cwiseAbs().colwise().maxCoeff();
-    Eigen::VectorXd&& height_distance =
-        (p.row(2).cwiseAbs().array() - (height_ / 2.0)).cwiseMax(0.0);
-    return (outside_distance + inside_distance).cwiseMax(height_distance);
+    Eigen::VectorXd&& d = p.topRows(2).colwise().norm();
+    Eigen::Matrix2Xd p_projected(2, d.size());
+    p_projected.row(0) = d;
+    p_projected.row(1) = p.row(2);
+
+    auto half_width = Eigen::Vector2d(radius_, height_ / 2.0);
+    auto d_2d = p_projected.cwiseAbs().colwise() - half_width;
+    auto outside_distance = (d_2d.cwiseMax(0.0)).colwise().norm();
+    auto inside_distance = d_2d.cwiseMin(0.0).colwise().maxCoeff();
+    Values vals = outside_distance + inside_distance;
+    return vals;
   }
 };
 
