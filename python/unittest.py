@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pytest
 from skrobot.sdf import BoxSDF, SphereSDF, CylinderSDF, UnionSDF, SignedDistanceFunction
@@ -53,3 +54,25 @@ def test_union_sdf():
         sk_dist = sksdf(points)
         dist = psdf.evaluate(points.T)
         assert np.allclose(sk_dist, dist)
+
+
+def test_speed():
+    sdf1 = BoxSDF([1, 1, 1])
+    xyz = np.random.randn(3)
+    ypr = np.random.randn(3)
+    sdf1.newcoords(Coordinates(xyz, ypr))
+    sdf2 = SphereSDF(1)
+    sksdf = UnionSDF([sdf1, sdf2])
+    psdf = convert(sksdf)
+
+    points = np.random.randn(100, 3)
+    ts = time.time()
+    for _ in range(10000):
+        sksdf(points)
+    skrobot_time = time.time() - ts
+    ts = time.time()
+    for _ in range(10000):
+        dist = psdf.evaluate(points.T)
+    psdf_time = time.time() - ts
+    print(f"skrobot_time: {skrobot_time}, psdf_time: {psdf_time}")
+    assert psdf_time < skrobot_time * 0.1
