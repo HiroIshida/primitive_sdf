@@ -1,0 +1,55 @@
+import numpy as np
+import pytest
+from skrobot.sdf import BoxSDF, SphereSDF, CylinderSDF, UnionSDF, SignedDistanceFunction
+from skrobot.coordinates import Coordinates
+import psdf
+
+def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
+    pose = psdf.Pose(sksdf.worldpos(), sksdf.worldrot())
+    if isinstance(sksdf, BoxSDF):
+        return psdf.BoxSDF(sksdf._width, pose)
+    elif isinstance(sksdf, SphereSDF):
+        return psdf.SphereSDF(sksdf._radius, pose)
+    elif isinstance(sksdf, CylinderSDF):
+        return psdf.CylinderSDF(sksdf._radius, sksdf._height, pose)
+    elif isinstance(sksdf, UnionSDF):
+        return psdf.UnionSDF([convert(s) for s in sksdf.sdf_list])
+    else:
+        raise ValueError("Unknown SDF type")
+
+
+sksdfs = [
+        BoxSDF([1, 1, 1]),
+        SphereSDF(1),
+        CylinderSDF(1, 1),
+        ]
+
+@pytest.mark.parametrize("sksdf", sksdfs)
+def test_primitive_sdfs(sksdf):
+    for _ in range(10):
+        xyz = np.random.randn(3)
+        ypr = np.random.randn(3)
+        sksdf.newcoords(Coordinates(xyz, ypr))
+        psdf: psdf.BoxSDF = convert(sksdf)
+
+        points = np.random.randn(100, 3)
+        sk_dist = sksdf(points)
+        dist = psdf.evaluate(points.T)
+        assert np.allclose(sk_dist, dist)
+
+
+def test_union_sdf():
+
+    for _ in range(10):
+        sdf1 = BoxSDF([1, 1, 1])
+        xyz = np.random.randn(3)
+        ypr = np.random.randn(3)
+        sdf1.newcoords(Coordinates(xyz, ypr))
+        sdf2 = SphereSDF(1)
+        sksdf = UnionSDF([sdf1, sdf2])
+        psdf = convert(sksdf)
+
+        points = np.random.randn(100, 3)
+        sk_dist = sksdf(points)
+        dist = psdf.evaluate(points.T)
+        assert np.allclose(sk_dist, dist)
