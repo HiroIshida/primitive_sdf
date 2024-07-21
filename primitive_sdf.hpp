@@ -25,12 +25,14 @@ class Pose {
 
 class SDFBase {
  public:
+  using Ptr = std::shared_ptr<SDFBase>;
   virtual Values evaluate(const Points& p) const = 0;
 };
 
 class UnionSDF : public SDFBase {
  public:
-  UnionSDF(std::vector<std::shared_ptr<SDFBase>> sdfs) : sdfs_(sdfs) {}
+  using Ptr = std::shared_ptr<UnionSDF>;
+  UnionSDF(std::vector<SDFBase::Ptr> sdfs) : sdfs_(sdfs) {}
   Values evaluate(const Points& p) const override {
     Values vals = sdfs_[0]->evaluate(p);
     for (size_t i = 1; i < sdfs_.size(); i++) {
@@ -45,6 +47,7 @@ class UnionSDF : public SDFBase {
 
 class PrimitiveSDFBase : public SDFBase {
  public:
+  using Ptr = std::shared_ptr<PrimitiveSDFBase>;
   PrimitiveSDFBase(const Pose& tf) : tf_(tf) {}
 
   Values evaluate(const Points& p) const override {
@@ -60,6 +63,7 @@ class PrimitiveSDFBase : public SDFBase {
 
 class BoxSDF : public PrimitiveSDFBase {
  public:
+  using Ptr = std::shared_ptr<BoxSDF>;
   Eigen::Vector3d width_;
 
   BoxSDF(const Eigen::Vector3d& width, const Pose& tf)
@@ -78,6 +82,7 @@ class BoxSDF : public PrimitiveSDFBase {
 
 class CylinderSDF : public PrimitiveSDFBase {
  public:
+  using Ptr = std::shared_ptr<CylinderSDF>;
   double radius_;
   double height_;
   CylinderSDF(double radius, double height, const Pose& tf)
@@ -101,6 +106,7 @@ class CylinderSDF : public PrimitiveSDFBase {
 
 class SphereSDF : public PrimitiveSDFBase {
  public:
+  using Ptr = std::shared_ptr<SphereSDF>;
   double radius_;
 
   SphereSDF(double radius, const Pose& tf)
