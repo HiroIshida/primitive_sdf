@@ -7,9 +7,9 @@ setup(
     name="psdf",
     version="0.0.0",
     description="primitive sdf",
-    author='Hirokazu Ishida',
+    author="Hirokazu Ishida",
     license="MIT",
     packages=["psdf"],
-    package_dir={'': 'python'},
-    cmake_install_dir='python/psdf/',
-    )
+    package_dir={"": "python"},
+    cmake_install_dir="python/psdf/",
+)

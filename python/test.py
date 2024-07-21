@@ -1,9 +1,11 @@
 import time
+
 import numpy as np
-import pytest
-from skrobot.sdf import BoxSDF, SphereSDF, CylinderSDF, UnionSDF, SignedDistanceFunction
-from skrobot.coordinates import Coordinates
 import psdf
+import pytest
+from skrobot.coordinates import Coordinates
+from skrobot.sdf import BoxSDF, CylinderSDF, SignedDistanceFunction, SphereSDF, UnionSDF
+
 
 def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
     pose = psdf.Pose(sksdf.worldpos(), sksdf.worldrot())
@@ -20,10 +22,11 @@ def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
 
 
 sksdfs = [
-        BoxSDF([1, 1, 1]),
-        SphereSDF(1),
-        CylinderSDF(1, 1),
-        ]
+    BoxSDF([1, 1, 1]),
+    SphereSDF(1),
+    CylinderSDF(1, 1),
+]
+
 
 @pytest.mark.parametrize("sksdf", sksdfs)
 def test_primitive_sdfs(sksdf):
@@ -72,7 +75,7 @@ def test_speed():
     skrobot_time = time.time() - ts
     ts = time.time()
     for _ in range(10000):
-        dist = psdf.evaluate(points.T)
+        psdf.evaluate(points.T)
     psdf_time = time.time() - ts
     print(f"skrobot_time: {skrobot_time}, psdf_time: {psdf_time}")
     assert psdf_time < skrobot_time * 0.1
