@@ -11,7 +11,9 @@ class SDFBase:
     def evaluate(self, points: np.ndarray) -> np.ndarray:
         """ Evaluate the SDF at the given points.
         Args:
-            points: The (n_pts, 3) points to evaluate the SDF at.
+            points: The (3, n_pts) points to evaluate the SDF at.
+                TODO: Should this be a (n_pts, 3) array for consistency with numpy?
+                This would require changing Eigen's default storage order to be row-major.
         Returns:
             The signed distance at each point.
         """
