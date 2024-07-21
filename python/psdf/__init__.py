@@ -1,7 +1,5 @@
-from . import _psdf
+from ._psdf import SDFBase, BoxSDF, CylinderSDF, SphereSDF, UnionSDF, Pose
 
-Pose = _psdf.Pose
-BoxSDF = _psdf.BoxSDF
-CylinderSDF = _psdf.CylinderSDF
+__all__ = ['SDFBase', 'BoxSDF', 'CylinderSDF', 'SphereSDF', 'UnionSDF', 'Pose']
 
 
