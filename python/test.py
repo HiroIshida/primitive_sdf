@@ -8,6 +8,7 @@ from skrobot.sdf import BoxSDF, CylinderSDF, SignedDistanceFunction, SphereSDF, 
 
 
 def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
+    # get xyz and rotation matrix from sksdf and create Pose
     pose = psdf.Pose(sksdf.worldpos(), sksdf.worldrot())
     if isinstance(sksdf, BoxSDF):
         return psdf.BoxSDF(sksdf._width, pose)
