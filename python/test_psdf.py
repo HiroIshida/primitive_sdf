@@ -35,11 +35,11 @@ def test_primitive_sdfs(sksdf):
         xyz = np.random.randn(3)
         ypr = np.random.randn(3)
         sksdf.newcoords(Coordinates(xyz, ypr))
-        psdf: psdf.BoxSDF = convert(sksdf)
+        cppsdf = convert(sksdf)
 
         points = np.random.randn(100, 3)
         sk_dist = sksdf(points)
-        dist = psdf.evaluate(points.T)
+        dist = cppsdf.evaluate(points.T)
         assert np.allclose(sk_dist, dist)
 
 
@@ -52,11 +52,11 @@ def test_union_sdf():
         sdf1.newcoords(Coordinates(xyz, ypr))
         sdf2 = SphereSDF(1)
         sksdf = UnionSDF([sdf1, sdf2])
-        psdf = convert(sksdf)
+        cppsdf = convert(sksdf)
 
         points = np.random.randn(100, 3)
         sk_dist = sksdf(points)
-        dist = psdf.evaluate(points.T)
+        dist = cppsdf.evaluate(points.T)
         assert np.allclose(sk_dist, dist)
 
 
@@ -67,7 +67,7 @@ def test_speed():
     sdf1.newcoords(Coordinates(xyz, ypr))
     sdf2 = SphereSDF(1)
     sksdf = UnionSDF([sdf1, sdf2])
-    psdf = convert(sksdf)
+    cppsdf = convert(sksdf)
 
     points = np.random.randn(100, 3)
     ts = time.time()
@@ -76,7 +76,7 @@ def test_speed():
     skrobot_time = time.time() - ts
     ts = time.time()
     for _ in range(10000):
-        psdf.evaluate(points.T)
-    psdf_time = time.time() - ts
-    print(f"skrobot_time: {skrobot_time}, psdf_time: {psdf_time}")
-    assert psdf_time < skrobot_time * 0.1
+        cppsdf.evaluate(points.T)
+    cppsdf_time = time.time() - ts
+    print(f"skrobot_time: {skrobot_time}, cppsdf_time: {cppsdf_time}")
+    assert cppsdf_time < skrobot_time * 0.1
