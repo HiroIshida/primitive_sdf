@@ -2,10 +2,16 @@
 Collection of primitive SDFs written in c++, targeted for use from Python.
 
 ## Installation
+From pypi
 ```bash
 sudo apt install libeigen3-dev
 pip3 install scikit-build
-pip3 install -e . -v
+pip3 install psdf
+```
+
+From source
+```bash
+pip3 install -e . -v  # instad of pip3 install psdf
 ```
 
 ## Usage
