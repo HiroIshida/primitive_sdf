@@ -1,0 +1,33 @@
+name: check-format
+
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.8'
+      - name: Install formatters
+        run: |
+          sudo apt-get update
+          sudo apt-get install clang-format
+          pip3 install black==22.6.0
+          pip3 install isort
+          pip3 install flake8
+
+      - name: Check formatting
+        run: |
+          bash ./format.sh
