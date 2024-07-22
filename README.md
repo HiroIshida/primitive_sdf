@@ -1,4 +1,4 @@
-## primitive_sdf
+## primitive_sdf [![PyPI version](https://badge.fury.io/py/psdf.svg)](https://pypi.org/project/psdf/) [![build_and_test](https://github.com/HiroIshida/primitive_sdf/actions/workflows/build_and_test.yaml/badge.svg)](https://github.com/HiroIshida/primitive_sdf/actions/workflows/build_and_test.yaml)
 Collection of primitive SDFs written in c++, targeted for use from Python.
 
 ## Installation
