@@ -12,5 +12,6 @@ setup(
     install_requires=["numpy"],
     packages=["psdf"],
     package_dir={"": "python"},
+    package_data={"psdf": ["__init__.pyi"]},
     cmake_install_dir="python/psdf/",
 )
