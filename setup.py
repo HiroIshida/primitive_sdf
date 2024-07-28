@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="psdf",
-    version="0.0.1",
+    version="0.0.2.1",
     description="primitive sdf",
     author="Hirokazu Ishida",
     license="MIT",
