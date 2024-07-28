@@ -1,4 +1,8 @@
 find_package(Eigen3 REQUIRED)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
 ADD_DEFINITIONS(-DEIGEN_NO_DEBUG)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
@@ -11,3 +15,5 @@ if(BUILD_BINDING)
   pybind11_add_module(_psdf binding.cpp)
   install(TARGETS _psdf DESTINATION .)
 endif(BUILD_BINDING)
+
+add_executable(bench bench/bench.cpp)
