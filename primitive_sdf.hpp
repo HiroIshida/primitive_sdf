@@ -111,7 +111,7 @@ class BoxSDF : public PrimitiveSDFBase {
 
  private:
   Values evaluate_in_local_frame(const Points& p) const override {
-    auto half_width = width_ / 2.0;
+    auto&& half_width = width_ * 0.5;
     auto d = p.cwiseAbs().colwise() - half_width;
     auto outside_distance = (d.cwiseMax(0.0)).colwise().norm();
     auto inside_distance = d.cwiseMin(0.0).colwise().maxCoeff();
@@ -120,7 +120,7 @@ class BoxSDF : public PrimitiveSDFBase {
   }
 
   double evaluate_in_local_frame(const Point& p) const override {
-    auto half_width = width_ / 2.0;
+    auto&& half_width = width_ * 0.5;
     auto d = p.cwiseAbs() - half_width;
     auto outside_distance = (d.cwiseMax(0.0)).norm();
     auto inside_distance = d.cwiseMin(0.0).maxCoeff();
@@ -129,7 +129,7 @@ class BoxSDF : public PrimitiveSDFBase {
 
   bool is_outside_in_local_frame(const Point& p) const override {
     // duplication of above but for performance
-    auto half_width = width_ / 2.0;
+    auto&& half_width = width_ * 0.5;
     auto d = p.cwiseAbs() - half_width;
     auto inside_distance = d.cwiseMin(0.0).maxCoeff();
     // if inside_distance == 0, then it is at least on the surface thus
@@ -152,7 +152,7 @@ class CylinderSDF : public PrimitiveSDFBase {
     p_projected.row(0) = d;
     p_projected.row(1) = p.row(2);
 
-    auto half_width = Eigen::Vector2d(radius_, height_ / 2.0);
+    auto&& half_width = Eigen::Vector2d(radius_, height_ * 0.5);
     auto d_2d = p_projected.cwiseAbs().colwise() - half_width;
     auto outside_distance = (d_2d.cwiseMax(0.0)).colwise().norm();
     auto inside_distance = d_2d.cwiseMin(0.0).colwise().maxCoeff();
@@ -164,7 +164,7 @@ class CylinderSDF : public PrimitiveSDFBase {
     double d = p.topRows(2).norm();
     Eigen::Vector2d p_projected(d, p(2));
 
-    auto half_width = Eigen::Vector2d(radius_, height_ / 2.0);
+    auto&& half_width = Eigen::Vector2d(radius_, height_ * 0.5);
     auto d_2d = p_projected.cwiseAbs() - half_width;
     auto outside_distance = (d_2d.cwiseMax(0.0)).norm();
     auto inside_distance = d_2d.cwiseMin(0.0).maxCoeff();
@@ -175,7 +175,7 @@ class CylinderSDF : public PrimitiveSDFBase {
     // almost copied from above but for performance
     double d = p.topRows(2).norm();
     Eigen::Vector2d p_projected(d, p(2));
-    auto half_width = Eigen::Vector2d(radius_, height_ / 2.0);
+    auto&& half_width = Eigen::Vector2d(radius_, height_ * 0.5);
     auto d_2d = p_projected.cwiseAbs() - half_width;
     auto inside_distance = d_2d.cwiseMin(0.0).maxCoeff();
     // if inside_distance == 0, then it is at least on the surface thus
