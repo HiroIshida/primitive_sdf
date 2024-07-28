@@ -35,6 +35,7 @@ class SDFBase {
   // for ease of binding to python, we name different functions
   virtual Values evaluate_batch(const Points& p) const = 0;
   virtual double evaluate(const Point& p) const = 0;
+  virtual bool is_outside(const Point& p) const = 0;
 };
 
 class UnionSDF : public SDFBase {
@@ -57,6 +58,15 @@ class UnionSDF : public SDFBase {
     return val;
   }
 
+  bool is_outside(const Point& p) const override {
+    for (const auto& sdf : sdfs_) {
+      if (!sdf->is_outside(p)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
  private:
   std::vector<std::shared_ptr<SDFBase>> sdfs_;
 };
@@ -76,11 +86,19 @@ class PrimitiveSDFBase : public SDFBase {
     return evaluate_in_local_frame(p_local);
   }
 
+  bool is_outside(const Point& p) const override {
+    auto p_local = tf_.transform_point(p);
+    return is_outside_in_local_frame(p_local);
+  }
+
   Pose tf_;
 
  protected:
   virtual Values evaluate_in_local_frame(const Points& p) const = 0;
   virtual double evaluate_in_local_frame(const Point& p) const = 0;
+  virtual bool is_outside_in_local_frame(const Point& p) const {
+    return evaluate_in_local_frame(p) > 0;
+  }  // maybe override this for performance
 };
 
 class BoxSDF : public PrimitiveSDFBase {
@@ -107,6 +125,15 @@ class BoxSDF : public PrimitiveSDFBase {
     auto outside_distance = (d.cwiseMax(0.0)).norm();
     auto inside_distance = d.cwiseMin(0.0).maxCoeff();
     return outside_distance + inside_distance;
+  }
+
+  bool is_outside_in_local_frame(const Point& p) const override {
+    // duplication of above but for performance
+    auto half_width = width_ / 2.0;
+    auto d = p.cwiseAbs() - half_width;
+    auto inside_distance = d.cwiseMin(0.0).maxCoeff();
+    // if inside_distance == 0, then it is at least on the surface thus
+    return inside_distance == 0.0;
   }
 };
 
@@ -142,6 +169,17 @@ class CylinderSDF : public PrimitiveSDFBase {
     auto outside_distance = (d_2d.cwiseMax(0.0)).norm();
     auto inside_distance = d_2d.cwiseMin(0.0).maxCoeff();
     return outside_distance + inside_distance;
+  }
+
+  bool is_outside_in_local_frame(const Point& p) const override {
+    // almost copied from above but for performance
+    double d = p.topRows(2).norm();
+    Eigen::Vector2d p_projected(d, p(2));
+    auto half_width = Eigen::Vector2d(radius_, height_ / 2.0);
+    auto d_2d = p_projected.cwiseAbs() - half_width;
+    auto inside_distance = d_2d.cwiseMin(0.0).maxCoeff();
+    // if inside_distance == 0, then it is at least on the surface thus
+    return inside_distance == 0.0;
   }
 };
 

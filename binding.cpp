@@ -17,19 +17,23 @@ PYBIND11_MODULE(_psdf, m) {
   py::class_<UnionSDF, UnionSDF::Ptr, SDFBase>(m, "UnionSDF")
       .def(py::init<std::vector<SDFBase::Ptr>>())
       .def("evaluate_batch", &UnionSDF::evaluate_batch)
-      .def("evaluate", &UnionSDF::evaluate);
+      .def("evaluate", &UnionSDF::evaluate)
+      .def("is_outside", &UnionSDF::is_outside);
   py::class_<BoxSDF, BoxSDF::Ptr, SDFBase>(m, "BoxSDF")
       .def(py::init<const Eigen::Vector3d&, const Pose&>())
       .def("evaluate_batch", &BoxSDF::evaluate_batch)
-      .def("evaluate", &BoxSDF::evaluate);
+      .def("evaluate", &BoxSDF::evaluate)
+      .def("is_outside", &BoxSDF::is_outside);
   py::class_<CylinderSDF, CylinderSDF::Ptr, SDFBase>(m, "CylinderSDF")
       .def(py::init<double, double, const Pose&>())
       .def("evaluate_batch", &CylinderSDF::evaluate_batch)
-      .def("evaluate", &CylinderSDF::evaluate);
+      .def("evaluate", &CylinderSDF::evaluate)
+      .def("is_outside", &CylinderSDF::is_outside);
   py::class_<SphereSDF, SphereSDF::Ptr, SDFBase>(m, "SphereSDF")
       .def(py::init<double, const Pose&>())
       .def("evaluate_batch", &SphereSDF::evaluate_batch)
-      .def("evaluate", &SphereSDF::evaluate);
+      .def("evaluate", &SphereSDF::evaluate)
+      .def("is_outside", &SphereSDF::is_outside);
 }
 
 }  // namespace primitive_sdf
