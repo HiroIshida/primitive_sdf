@@ -23,5 +23,5 @@ pose = Pose(np.ones(3), np.eye(3))  # trans and rot mat
 sdf1 = BoxSDF(np.ones(3), pose)
 sdf2 = CylinderSDF(1, 1, pose)
 sdf = UnionSDF([sdf1, sdf2])
-values = sdf.evaluate(np.random.randn(3, 1000))
+values = sdf.evaluate_batch(np.random.randn(3, 1000))
 ```

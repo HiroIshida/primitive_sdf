@@ -8,7 +8,7 @@ class Pose:
     def __init__(self, translation: np.ndarray, rotation: np.ndarray) -> None: ...
 
 class SDFBase:
-    def evaluate(self, points: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, points: np.ndarray) -> np.ndarray:
         """Evaluate the SDF at the given points.
         Args:
             points: The (3, n_pts) points to evaluate the SDF at.
@@ -18,6 +18,14 @@ class SDFBase:
             The signed distance at each point.
         """
     ...
+
+    def evaluate(self, point: np.ndarray) -> float:
+        """Evaluate the SDF at a single point.
+        Args:
+            point: The (3,) point to evaluate the SDF at.
+        Returns:
+            The signed distance at the point.
+        """
 
 class UnionSDF(SDFBase):
     def __init__(self, sdf_list: List[SDFBase]) -> None: ...

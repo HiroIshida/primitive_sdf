@@ -22,6 +22,12 @@ def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
         raise ValueError("Unknown SDF type")
 
 
+def check_single_batch_consistency(cppsdf: psdf.SDFBase, points):
+    values = [cppsdf.evaluate(p) for p in points]
+    values_batch = cppsdf.evaluate_batch(points.T)
+    assert np.allclose(values, values_batch)
+
+
 sksdfs = [
     BoxSDF([1, 1, 1]),
     SphereSDF(1),
@@ -39,8 +45,10 @@ def test_primitive_sdfs(sksdf):
 
         points = np.random.randn(100, 3)
         sk_dist = sksdf(points)
-        dist = cppsdf.evaluate(points.T)
+        dist = cppsdf.evaluate_batch(points.T)
         assert np.allclose(sk_dist, dist)
+
+        check_single_batch_consistency(cppsdf, points)
 
 
 def test_union_sdf():
@@ -56,8 +64,10 @@ def test_union_sdf():
 
         points = np.random.randn(100, 3)
         sk_dist = sksdf(points)
-        dist = cppsdf.evaluate(points.T)
+        dist = cppsdf.evaluate_batch(points.T)
         assert np.allclose(sk_dist, dist)
+
+        check_single_batch_consistency(cppsdf, points)
 
 
 def test_speed():
@@ -76,7 +86,7 @@ def test_speed():
     skrobot_time = time.time() - ts
     ts = time.time()
     for _ in range(10000):
-        cppsdf.evaluate(points.T)
+        cppsdf.evaluate_batch(points.T)
     cppsdf_time = time.time() - ts
     print(f"skrobot_time: {skrobot_time}, cppsdf_time: {cppsdf_time}")
     assert cppsdf_time < skrobot_time * 0.1
