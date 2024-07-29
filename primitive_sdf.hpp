@@ -24,6 +24,8 @@ class Pose {
     return rot_inv_ * (p - position_);
   }
 
+  void set_position(const Eigen::Vector3d& position) { position_ = position; }
+
  private:
   Eigen::Vector3d position_;
   Eigen::Matrix3d rot_inv_;
