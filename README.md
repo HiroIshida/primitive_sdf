@@ -9,7 +9,7 @@ pip3 install scikit-build
 pip3 install psdf
 ```
 
-From source
+From source (beta version)
 ```bash
 pip3 install -e . -v  # instad of pip3 install psdf
 ```
