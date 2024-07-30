@@ -1,3 +1,6 @@
+#ifndef PRIMITIVE_SDF_HPP
+#define PRIMITIVE_SDF_HPP
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <iostream>
@@ -184,3 +187,4 @@ class SphereSDF : public PrimitiveSDFBase {
 };
 
 }  // namespace primitive_sdf
+#endif
