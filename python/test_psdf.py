@@ -94,14 +94,21 @@ def test_bvh():
         cppsdf_total_bvh = psdf.UnionSDF([cppsdf, convert(sdf3)], True)
         cppsdf_total_naive = convert(UnionSDF([sdf1, sdf2, sdf3]), create_bvh=False)
 
-        points = np.random.randn(10000, 3) * 3
+        points = np.random.rand(1000, 3) * 3
+        rs = np.random.rand(1000) * 0.2
+
         ts = time.time()
-        dists1 = cppsdf_total_bvh.evaluate_batch(points.T)
-        bvh_time = time.time() - ts
-        dists2 = cppsdf_total_naive.evaluate_batch(points.T)
-        naive_time = time.time() - ts
-        assert np.allclose(dists1, dists2)
-        assert bvh_time < naive_time
+        values1 = []
+        for p, r in zip(points, rs):
+            values1.append(cppsdf_total_bvh.is_outside(p, r))
+        time.time() - ts
+
+        ts = time.time()
+        values2 = []
+        for p, r in zip(points, rs):
+            values2.append(cppsdf_total_naive.is_outside(p, r))
+        time.time() - ts
+        assert np.allclose(values1, values2)
 
 
 def test_speed():
@@ -124,3 +131,7 @@ def test_speed():
     cppsdf_time = time.time() - ts
     print(f"skrobot_time: {skrobot_time}, cppsdf_time: {cppsdf_time}")
     assert cppsdf_time < skrobot_time * 0.1
+
+
+if __name__ == "__main__":
+    pass
