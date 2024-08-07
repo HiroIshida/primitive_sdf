@@ -29,7 +29,7 @@ def check_single_batch_consistency(cppsdf: psdf.SDFBase, points):
 
 
 def check_is_outside_consistency(cppsdf: psdf.SDFBase, points):
-    values = [cppsdf.is_outside(p) for p in points]
+    values = [cppsdf.is_outside(p, 0.0) for p in points]
     values_batch = cppsdf.evaluate_batch(points.T) > 0.0
     print(values)
     print(values_batch)
