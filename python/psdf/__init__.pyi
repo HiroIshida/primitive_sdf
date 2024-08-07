@@ -26,7 +26,13 @@ class SDFBase:
         Returns:
             The signed distance at the point.
         """
-        ...
+    def is_outside(self, point: np.ndarray) -> bool:
+        """Check if a point is outside the shape.
+        Args:
+            point: The (3,) point to check.
+        Returns:
+            True if the point is outside, False otherwise.
+        """
 
 class UnionSDF(SDFBase):
     def __init__(self, sdf_list: List[SDFBase]) -> None: ...

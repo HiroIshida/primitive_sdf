@@ -36,4 +36,17 @@ int main() {
     std::cout << "Time per iter: " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / n_iter << " ns" << std::endl;
     std::cout << value << std::endl; // dummy value to avoid compiler optimization
   }
+  {
+    std::cout << "iter is_outside() for 100 points" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    bool value = false;
+    for(size_t i = 0; i < n_iter; i++) {
+      for(size_t j = 0; j < p.cols(); j++) {
+        value += sdf.is_outside(p.col(j), 0.0);
+      }
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Time per iter: " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / n_iter << " ns" << std::endl;
+    std::cout << value << std::endl;  // dummy value to avoid compiler optimization
+  }
 }

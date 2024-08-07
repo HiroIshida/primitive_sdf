@@ -28,6 +28,14 @@ def check_single_batch_consistency(cppsdf: psdf.SDFBase, points):
     assert np.allclose(values, values_batch)
 
 
+def check_is_outside_consistency(cppsdf: psdf.SDFBase, points):
+    values = [cppsdf.is_outside(p, 0.0) for p in points]
+    values_batch = cppsdf.evaluate_batch(points.T) > 0.0
+    print(values)
+    print(values_batch)
+    assert np.allclose(values, values_batch)
+
+
 sksdfs = [
     BoxSDF([1, 1, 1]),
     SphereSDF(1),
@@ -49,6 +57,7 @@ def test_primitive_sdfs(sksdf):
         assert np.allclose(sk_dist, dist)
 
         check_single_batch_consistency(cppsdf, points)
+        check_is_outside_consistency(cppsdf, points)
 
 
 def test_union_sdf():
@@ -68,6 +77,7 @@ def test_union_sdf():
         assert np.allclose(sk_dist, dist)
 
         check_single_batch_consistency(cppsdf, points)
+        check_is_outside_consistency(cppsdf, points)
 
 
 def test_speed():

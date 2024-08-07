@@ -1,3 +1,6 @@
+#ifndef PRIMITIVE_SDF_HPP
+#define PRIMITIVE_SDF_HPP
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <iostream>
@@ -24,6 +27,8 @@ class Pose {
     return rot_inv_ * (p - position_);
   }
 
+  void set_position(const Eigen::Vector3d& position) { position_ = position; }
+
  private:
   Eigen::Vector3d position_;
   Eigen::Matrix3d rot_inv_;
@@ -35,6 +40,7 @@ class SDFBase {
   // for ease of binding to python, we name different functions
   virtual Values evaluate_batch(const Points& p) const = 0;
   virtual double evaluate(const Point& p) const = 0;
+  virtual bool is_outside(const Point& p, double radius) const = 0;
 };
 
 class UnionSDF : public SDFBase {
@@ -57,6 +63,15 @@ class UnionSDF : public SDFBase {
     return val;
   }
 
+  bool is_outside(const Point& p, double radius) const override {
+    for (const auto& sdf : sdfs_) {
+      if (!sdf->is_outside(p, radius)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
  private:
   std::vector<std::shared_ptr<SDFBase>> sdfs_;
 };
@@ -76,11 +91,19 @@ class PrimitiveSDFBase : public SDFBase {
     return evaluate_in_local_frame(p_local);
   }
 
+  bool is_outside(const Point& p, double radius) const override {
+    auto p_local = tf_.transform_point(p);
+    return is_outside_in_local_frame(p_local, radius);
+  }
+
   Pose tf_;
 
  protected:
   virtual Values evaluate_in_local_frame(const Points& p) const = 0;
   virtual double evaluate_in_local_frame(const Point& p) const = 0;
+  virtual bool is_outside_in_local_frame(const Point& p, double radius) const {
+    return evaluate_in_local_frame(p) > radius;
+  }  // maybe override this for performance
 };
 
 class BoxSDF : public PrimitiveSDFBase {
@@ -164,3 +187,4 @@ class SphereSDF : public PrimitiveSDFBase {
 };
 
 }  // namespace primitive_sdf
+#endif
