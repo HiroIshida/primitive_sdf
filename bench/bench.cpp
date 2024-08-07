@@ -9,7 +9,7 @@ int main() {
   auto pose = Pose(Eigen::Vector3d(1, 1, 1), Eigen::Matrix3d::Identity());
   auto box = std::make_shared<BoxSDF>(Eigen::Vector3d(1, 1, 1), pose);
   auto cylinder = std::make_shared<CylinderSDF>(1.0, 1.0, pose);
-  auto sdf = UnionSDF({box, cylinder});
+  auto sdf = UnionSDF({box, cylinder}, true);
 
   // create random 3 x 100 points
   Points p = Points::Random(3, 100);

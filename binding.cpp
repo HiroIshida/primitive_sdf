@@ -15,7 +15,7 @@ PYBIND11_MODULE(_psdf, m) {
       m, "SDFBase");  // user is not supposed to instantiate this class. This to
                       // tell pybind that this is a base class
   py::class_<UnionSDF, UnionSDF::Ptr, SDFBase>(m, "UnionSDF")
-      .def(py::init<std::vector<SDFBase::Ptr>>())
+      .def(py::init<std::vector<SDFBase::Ptr>, bool>())
       .def("evaluate_batch", &UnionSDF::evaluate_batch)
       .def("evaluate", &UnionSDF::evaluate)
       .def("is_outside", &UnionSDF::is_outside);

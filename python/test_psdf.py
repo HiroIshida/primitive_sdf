@@ -7,7 +7,7 @@ from skrobot.coordinates import Coordinates
 from skrobot.sdf import BoxSDF, CylinderSDF, SignedDistanceFunction, SphereSDF, UnionSDF
 
 
-def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
+def convert(sksdf: SignedDistanceFunction, create_bvh: bool = False) -> psdf.SDFBase:
     # get xyz and rotation matrix from sksdf and create Pose
     pose = psdf.Pose(sksdf.worldpos(), sksdf.worldrot())
     if isinstance(sksdf, BoxSDF):
@@ -17,7 +17,7 @@ def convert(sksdf: SignedDistanceFunction) -> psdf.SDFBase:
     elif isinstance(sksdf, CylinderSDF):
         return psdf.CylinderSDF(sksdf._radius, sksdf._height, pose)
     elif isinstance(sksdf, UnionSDF):
-        return psdf.UnionSDF([convert(s) for s in sksdf.sdf_list])
+        return psdf.UnionSDF([convert(s) for s in sksdf.sdf_list], create_bvh)
     else:
         raise ValueError("Unknown SDF type")
 
@@ -78,6 +78,30 @@ def test_union_sdf():
 
         check_single_batch_consistency(cppsdf, points)
         check_is_outside_consistency(cppsdf, points)
+
+
+def test_bvh():
+    for _ in range(100):
+        sdf1 = BoxSDF([1, 1, 1])
+        sdf1.translate(np.random.rand(3) * 3)
+        sdf2 = SphereSDF(1)
+        sdf2.translate(np.random.rand(3) * 3)
+        sksdf = UnionSDF([sdf1, sdf2])
+        cppsdf = convert(sksdf, create_bvh=True)
+
+        sdf3 = CylinderSDF(1, 1)
+        sdf3.translate(np.random.rand(3) * 3)
+        cppsdf_total_bvh = psdf.UnionSDF([cppsdf, convert(sdf3)], True)
+        cppsdf_total_naive = convert(UnionSDF([sdf1, sdf2, sdf3]), create_bvh=False)
+
+        points = np.random.randn(10000, 3) * 3
+        ts = time.time()
+        dists1 = cppsdf_total_bvh.evaluate_batch(points.T)
+        bvh_time = time.time() - ts
+        dists2 = cppsdf_total_naive.evaluate_batch(points.T)
+        naive_time = time.time() - ts
+        assert np.allclose(dists1, dists2)
+        assert bvh_time < naive_time
 
 
 def test_speed():
