@@ -7,6 +7,10 @@ import numpy as np
 class Pose:
     def __init__(self, translation: np.ndarray, rotation: np.ndarray) -> None: ...
 
+class AABB:
+    lb: np.ndarray
+    ub: np.ndarray
+
 class SDFBase:
     def evaluate_batch(self, points: np.ndarray) -> np.ndarray:
         """Evaluate the SDF at the given points.
@@ -32,6 +36,11 @@ class SDFBase:
             point: The (3,) point to check.
         Returns:
             True if the point is outside, False otherwise.
+        """
+    def get_aabb(self) -> AABB:
+        """Get the axis-aligned bounding box of the SDF.
+        Returns:
+            The axis-aligned bounding box.
         """
 
 class UnionSDF(SDFBase):

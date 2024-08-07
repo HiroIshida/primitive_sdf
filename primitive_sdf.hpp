@@ -27,7 +27,7 @@ struct AABB {
 class Pose {
  public:
   Pose(const Eigen::Vector3d& position, const Eigen::Matrix3d& rotation)
-      : position_(position), rot_inv_(rotation.inverse()) {}
+      : position_(position), rot_(rotation), rot_inv_(rotation.inverse()) {}
 
   Points transform_points(const Points& p) const {
     return rot_inv_ * (p.colwise() - position_);
@@ -39,8 +39,11 @@ class Pose {
 
   void set_position(const Eigen::Vector3d& position) { position_ = position; }
 
+  Pose inverse() const { return Pose(-rot_ * position_, rot_inv_); }
+
  private:
   Eigen::Vector3d position_;
+  Eigen::Matrix3d rot_;
   Eigen::Matrix3d rot_inv_;
 };
 
@@ -109,7 +112,7 @@ class UnionSDF : public SDFBase {
 class PrimitiveSDFBase : public SDFBase {
  public:
   using Ptr = std::shared_ptr<PrimitiveSDFBase>;
-  PrimitiveSDFBase(const Pose& tf) : tf_(tf) {}
+  PrimitiveSDFBase(const Pose& tf) : tf_(tf), tf_inv_(tf.inverse()) {}
 
   Values evaluate_batch(const Points& p) const override {
     auto p_local = tf_.transform_points(p);
@@ -128,13 +131,14 @@ class PrimitiveSDFBase : public SDFBase {
 
   AABB get_aabb() const override {
     auto local_vertices = get_local_aabb_vertices();
-    auto world_vertices = tf_.transform_points(local_vertices);
+    auto world_vertices = tf_inv_.transform_points(local_vertices);
     auto lb = world_vertices.rowwise().minCoeff();
     auto ub = world_vertices.rowwise().maxCoeff();
     return {lb, ub};
   }
 
   Pose tf_;
+  Pose tf_inv_;
 
  protected:
   virtual Values evaluate_in_local_frame(const Points& p) const = 0;

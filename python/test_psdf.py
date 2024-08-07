@@ -31,8 +31,6 @@ def check_single_batch_consistency(cppsdf: psdf.SDFBase, points):
 def check_is_outside_consistency(cppsdf: psdf.SDFBase, points):
     values = [cppsdf.is_outside(p, 0.0) for p in points]
     values_batch = cppsdf.evaluate_batch(points.T) > 0.0
-    print(values)
-    print(values_batch)
     assert np.allclose(values, values_batch)
 
 
@@ -78,6 +76,41 @@ def test_union_sdf():
 
         check_single_batch_consistency(cppsdf, points)
         check_is_outside_consistency(cppsdf, points)
+
+
+def test_aabb_boxsdf():
+    sdf = BoxSDF([1, 2, 3])
+    sdf.translate(np.ones(3) * 0.5)
+    cpp_sdf = convert(sdf)
+    aabb = cpp_sdf.get_aabb()
+    assert np.allclose(aabb.lb, [0.0, -0.5, -1.0])
+    assert np.allclose(aabb.ub, [1.0, 1.5, 2.0])
+
+    sdf = BoxSDF([1, 1, 1])
+    sdf.rotate(np.pi / 6, "z")
+    cpp_sdf = convert(sdf)
+    aabb = cpp_sdf.get_aabb()
+    w = 0.5 * (np.cos(np.pi / 6) + np.sin(np.pi / 6))
+    assert np.allclose(aabb.lb, [-w, -w, -0.5])
+    assert np.allclose(aabb.ub, [+w, +w, 0.5])
+
+
+def test_aabb_spheresdf():
+    sdf = SphereSDF(1)
+    sdf.translate(np.ones(3) * 0.5)
+    cpp_sdf = convert(sdf)
+    aabb = cpp_sdf.get_aabb()
+    assert np.allclose(aabb.lb, [-0.5, -0.5, -0.5])
+    assert np.allclose(aabb.ub, [1.5, 1.5, 1.5])
+
+
+def test_aabb_cylindersdf():
+    sdf = CylinderSDF(2, 1)
+    sdf.translate(np.ones(3) * 0.5)
+    cpp_sdf = convert(sdf)
+    aabb = cpp_sdf.get_aabb()
+    assert np.allclose(aabb.lb, [-0.5, -0.5, -0.5])
+    assert np.allclose(aabb.ub, [1.5, 1.5, 1.5])
 
 
 def test_bvh():
